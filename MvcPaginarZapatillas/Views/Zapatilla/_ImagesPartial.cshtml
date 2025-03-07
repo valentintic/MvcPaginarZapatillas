@@ -1,0 +1,14 @@
+﻿@model List<ImagenZapatilla>
+@{
+	int posicion = ViewData["POSICION"] != null ? (int)ViewData["POSICION"] : 1;
+	int totalRegistros = ViewData["REGISTROTOTAL"] != null ? (int)ViewData["REGISTROTOTAL"] : 0;
+}
+
+<!-- Incluye los metadatos como atributos de datos -->
+<div class="imagenes-container" data-posicion="@posicion" data-total="@totalRegistros">
+	<!-- Tu código existente para mostrar las imágenes -->
+	@foreach (var imagen in Model)
+	{
+		<img style="width:350px; height:350px" src="@imagen.Imagen" alt="@imagen.IdImagen" />
+	}
+</div>

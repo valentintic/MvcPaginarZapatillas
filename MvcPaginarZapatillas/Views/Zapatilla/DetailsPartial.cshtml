@@ -1,0 +1,64 @@
+﻿@model Zapatilla
+
+@{
+	ViewData["Title"] = "Detalles de la Zapatilla";
+	int posicion = ViewData["POSICION"] != null ? (int)ViewData["POSICION"] : 1;
+	int totalRegistros = ViewData["REGISTROTOTAL"] != null ? (int)ViewData["REGISTROTOTAL"] : 0;
+}
+
+<h2>@Model.Name</h2>
+<p><strong>Precio:</strong> @Model.Precio €</p>
+<p><strong>Descripción:</strong> @Model.Descripcion</p>
+
+<hr>
+
+<!-- Contenedor donde se cargarán las imágenes -->
+<div id="detalle-imagenes">
+	@await Html.PartialAsync("_ImagesPartial", ViewData["Imagenes"])
+</div>
+
+@if (totalRegistros > 3)
+{
+	<div class="mt-3">
+		<button class="btn btn-primary" 
+		        onclick="cargarImagenes(@Model.Id, 1)" 
+		        >Primero</button>
+		<button class="btn btn-primary" 
+		        onclick="cargarImagenes(@Model.Id, @(posicion - 1))" 
+		        @(posicion == 1 ? "disabled" : "")>Anterior</button>
+		<button class="btn btn-primary" 
+		        onclick="cargarImagenes(@Model.Id, @(posicion + 1))" 
+		        @(posicion >= totalRegistros ? "disabled" : "")>Siguiente</button>
+    
+		<button class="btn btn-primary" 
+		        onclick="cargarImagenes(@Model.Id, @(totalRegistros))"
+                )>Ultimo</button>
+	</div>
+}
+
+<script>
+        function cargarImagenes(idZapatilla, posicion) {
+        if (posicion < 1) return;
+
+        $.ajax({
+            url: '@Url.Action("ImagesPartial", "Zapatilla")',
+            type: 'GET',
+            data: { idZapatilla: idZapatilla, posicion: posicion },
+            success: function (result) {
+                $('#detalle-imagenes').html(result);
+
+                const nuevaPosicion = $('.imagenes-container').data('posicion');
+                const totalRegistros = $('.imagenes-container').data('total');
+
+                $('button:contains("Primero")').attr('onclick', 'cargarImagenes(' + idZapatilla + ', ' + (1) + ')');
+                $('button:contains("Ultimo")').attr('onclick', 'cargarImagenes(' + idZapatilla + ', ' + (totalRegistros) + ')');
+
+                $('button:contains("Anterior")').attr('onclick', 'cargarImagenes(' + idZapatilla + ', ' + (nuevaPosicion - 1) + ')');
+                $('button:contains("Anterior")').prop('disabled', nuevaPosicion <= 1);
+
+                $('button:contains("Siguiente")').attr('onclick', 'cargarImagenes(' + idZapatilla + ', ' + (nuevaPosicion + 1) + ')');
+                $('button:contains("Siguiente")').prop('disabled', nuevaPosicion >= totalRegistros);
+            }
+        });
+    }
+</script>
